@@ -421,7 +421,7 @@ impl<'a> Fold for DependencyCollector<'a> {
     }
 
     if let Some(args) = &node.args {
-      if args.len() > 0 {
+      if !args.is_empty() {
         let (specifier, span) = if let Some(s) = match_import_meta_url(&*args[0].expr, self.decls) {
           s
         } else if let Lit(ast::Lit::Str(str_)) = &*args[0].expr {
