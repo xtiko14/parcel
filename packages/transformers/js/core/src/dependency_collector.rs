@@ -637,69 +637,66 @@ fn match_import_meta_url(
   expr: &ast::Expr,
   decls: &HashSet<(JsWord, SyntaxContext)>,
 ) -> Option<(JsWord, swc_common::Span)> {
-  match expr {
-    ast::Expr::New(new) => {
-      let is_url = match &*new.callee {
-        ast::Expr::Ident(id) => {
-          id.sym == js_word!("URL") && !decls.contains(&(id.sym.clone(), id.span.ctxt()))
+  if let ast::Expr::New(new) = expr {
+    let is_url = match &*new.callee {
+      ast::Expr::Ident(id) => {
+        id.sym == js_word!("URL") && !decls.contains(&(id.sym.clone(), id.span.ctxt()))
+      }
+      _ => false,
+    };
+
+    if !is_url {
+      return None;
+    }
+
+    if let Some(args) = &new.args {
+      let specifier = if let Some(arg) = args.get(0) {
+        match &*arg.expr {
+          ast::Expr::Lit(ast::Lit::Str(s)) => s,
+          _ => return None,
         }
-        _ => false,
+      } else {
+        return None;
       };
 
-      if !is_url {
-        return None;
-      }
-
-      if let Some(args) = &new.args {
-        let specifier = if let Some(arg) = args.get(0) {
-          match &*arg.expr {
-            ast::Expr::Lit(ast::Lit::Str(s)) => s,
-            _ => return None,
-          }
-        } else {
-          return None;
-        };
-
-        if let Some(arg) = args.get(1) {
-          match &*arg.expr {
-            ast::Expr::Member(member) => {
-              match &member.obj {
-                ast::ExprOrSuper::Expr(expr) => match &**expr {
-                  ast::Expr::MetaProp(ast::MetaPropExpr {
-                    meta:
-                      ast::Ident {
-                        sym: js_word!("import"),
-                        ..
-                      },
-                    prop:
-                      ast::Ident {
-                        sym: js_word!("meta"),
-                        ..
-                      },
-                  }) => {}
-                  _ => return None,
-                },
+      if let Some(arg) = args.get(1) {
+        match &*arg.expr {
+          ast::Expr::Member(member) => {
+            match &member.obj {
+              ast::ExprOrSuper::Expr(expr) => match &**expr {
+                ast::Expr::MetaProp(ast::MetaPropExpr {
+                  meta:
+                    ast::Ident {
+                      sym: js_word!("import"),
+                      ..
+                    },
+                  prop:
+                    ast::Ident {
+                      sym: js_word!("meta"),
+                      ..
+                    },
+                }) => {}
                 _ => return None,
-              }
-
-              let is_url = match &*member.prop {
-                ast::Expr::Ident(id) => id.sym == js_word!("url") && !member.computed,
-                ast::Expr::Lit(ast::Lit::Str(str)) => str.value == js_word!("url"),
-                _ => false,
-              };
-
-              if !is_url {
-                return None;
-              }
-
-              return Some((specifier.value.clone(), specifier.span));
+              },
+              _ => return None,
             }
-            _ => return None,
+
+            let is_url = match &*member.prop {
+              ast::Expr::Ident(id) => id.sym == js_word!("url") && !member.computed,
+              ast::Expr::Lit(ast::Lit::Str(str)) => str.value == js_word!("url"),
+              _ => false,
+            };
+
+            if !is_url {
+              return None;
+            }
+
+            return Some((specifier.value.clone(), specifier.span));
           }
+          _ => return None,
         }
       }
     }
-    _ => {}
   }
 
   None
