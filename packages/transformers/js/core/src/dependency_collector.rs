@@ -187,7 +187,7 @@ impl<'a> Fold for DependencyCollector<'a> {
           }
           "importScripts" => DependencyKind::ImportScripts,
           "__parcel__require__" => {
-            let mut call = node.clone();
+            let mut call = node;
             call.callee = ast::ExprOrSuper::Expr(Box::new(ast::Expr::Ident(ast::Ident::new(
               "require".into(),
               DUMMY_SP.apply_mark(self.ignore_mark),
@@ -195,7 +195,7 @@ impl<'a> Fold for DependencyCollector<'a> {
             return call;
           }
           "__parcel__import__" => {
-            let mut call = node.clone();
+            let mut call = node;
             call.callee = ast::ExprOrSuper::Expr(Box::new(ast::Expr::Ident(ast::Ident::new(
               "import".into(),
               DUMMY_SP.apply_mark(self.ignore_mark),
@@ -246,7 +246,7 @@ impl<'a> Fold for DependencyCollector<'a> {
                               //   => Promise.resolve().then(() => require('foo')).then(res => __importStar(res))
                               if let Some(require_node) = self.require_node.clone() {
                                 self.require_node = None;
-                                return build_promise_chain(node.clone(), require_node);
+                                return build_promise_chain(node, require_node);
                               }
                             }
                             _ => {}
@@ -304,7 +304,7 @@ impl<'a> Fold for DependencyCollector<'a> {
       // importScripts() accepts multiple arguments. Add dependencies for each
       // and replace with require calls for each of the specifiers (which will
       // return the resolved URL at runtime).
-      let mut node = node.clone();
+      let mut node = node;
       node.args = node
         .args
         .iter()
@@ -330,7 +330,7 @@ impl<'a> Fold for DependencyCollector<'a> {
     if let Some(arg) = node.args.get(0) {
       if kind == DependencyKind::ServiceWorker {
         if let Some((specifier, span)) = match_import_meta_url(&*arg.expr, self.decls) {
-          self.add_dependency(specifier.clone(), span, kind.clone(), attributes, false);
+          self.add_dependency(specifier.clone(), span, kind, attributes, false);
 
           let mut node = node.clone();
           node.args[0].expr = Box::new(Call(create_require(specifier)));
@@ -360,7 +360,7 @@ impl<'a> Fold for DependencyCollector<'a> {
 
     // Replace import() with require()
     if kind == DependencyKind::DynamicImport {
-      let mut call = node.clone();
+      let mut call = node;
       if !self.scope_hoist {
         call.callee = ast::ExprOrSuper::Expr(Box::new(ast::Expr::Ident(ast::Ident::new(
           "require".into(),
