@@ -362,18 +362,20 @@ fn parse(
 
   let comments = SingleThreadedComments::default();
   let syntax = if config.is_type_script {
-    let mut tsconfig = TsConfig::default();
-    tsconfig.tsx = config.is_jsx;
-    tsconfig.dynamic_import = true;
-    Syntax::Typescript(tsconfig)
+    Syntax::Typescript(TsConfig {
+      tsx: config.is_jsx,
+      dynamic_import: true,
+      ..Default::default()
+    })
   } else {
-    let mut esconfig = EsConfig::default();
-    esconfig.jsx = config.is_jsx;
-    esconfig.dynamic_import = true;
-    esconfig.export_default_from = true;
-    esconfig.export_namespace_from = true;
-    esconfig.import_meta = true;
-    Syntax::Es(esconfig)
+    Syntax::Es(EsConfig {
+      jsx: config.is_jsx,
+      dynamic_import: true,
+      export_default_from: true,
+      export_namespace_from: true,
+      import_meta: true,
+      ..Default::default()
+    })
   };
 
   let lexer = Lexer::new(
