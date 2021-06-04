@@ -302,15 +302,13 @@ impl<'a> Fold for DependencyCollector<'a> {
         .args
         .iter()
         .map(|arg| {
-          if let Lit(lit) = &*arg.expr {
-            if let ast::Lit::Str(str_) = lit {
-              self.add_dependency(str_.value.clone(), str_.span, kind.clone(), None, false);
+          if let Lit(ast::Lit::Str(str_)) = &*arg.expr {
+            self.add_dependency(str_.value.clone(), str_.span, kind.clone(), None, false);
 
-              return ast::ExprOrSpread {
-                spread: None,
-                expr: Box::new(Call(create_require(str_.value.clone()))),
-              };
-            }
+            return ast::ExprOrSpread {
+              spread: None,
+              expr: Box::new(Call(create_require(str_.value.clone()))),
+            };
           }
 
           arg.clone()
@@ -331,22 +329,20 @@ impl<'a> Fold for DependencyCollector<'a> {
         }
       }
 
-      if let Lit(lit) = &*arg.expr {
-        if let ast::Lit::Str(str_) = lit {
-          self.add_dependency(
-            str_.value.clone(),
-            str_.span,
-            kind.clone(),
-            attributes,
-            kind == DependencyKind::Require && self.in_try,
-          );
+      if let Lit(ast::Lit::Str(str_)) = &*arg.expr {
+        self.add_dependency(
+          str_.value.clone(),
+          str_.span,
+          kind.clone(),
+          attributes,
+          kind == DependencyKind::Require && self.in_try,
+        );
 
-          // If url dependency, replace import with require() of runtime module
-          if kind == DependencyKind::ServiceWorker {
-            let mut node = node.clone();
-            node.args[0].expr = Box::new(Call(create_require(str_.value.clone())));
-            return node;
-          }
+        // If url dependency, replace import with require() of runtime module
+        if kind == DependencyKind::ServiceWorker {
+          let mut node = node.clone();
+          node.args[0].expr = Box::new(Call(create_require(str_.value.clone())));
+          return node;
         }
       }
     }
@@ -428,12 +424,8 @@ impl<'a> Fold for DependencyCollector<'a> {
       if args.len() > 0 {
         let (specifier, span) = if let Some(s) = match_import_meta_url(&*args[0].expr, self.decls) {
           s
-        } else if let Lit(lit) = &*args[0].expr {
-          if let ast::Lit::Str(str_) = lit {
-            (str_.value.clone(), str_.span)
-          } else {
-            return node;
-          }
+        } else if let Lit(ast::Lit::Str(str_)) = &*args[0].expr {
+          (str_.value.clone(), str_.span)
         } else {
           return node;
         };

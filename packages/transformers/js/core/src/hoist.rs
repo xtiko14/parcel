@@ -515,10 +515,7 @@ impl<'a> Fold for Hoist<'a> {
               return Expr::Member(member.fold_children_with(self));
             }
           }
-          Expr::Lit(lit) => match lit {
-            Lit::Str(str_) => str_.value.clone(),
-            _ => return Expr::Member(member.fold_children_with(self)),
-          },
+          Expr::Lit(Lit::Str(str_)) => str_.value.clone(),
           _ => return Expr::Member(member.fold_children_with(self)),
         };
 
@@ -858,10 +855,7 @@ impl<'a> Fold for Hoist<'a> {
                 unreachable!("Unexpected non-static CJS export");
               }
             }
-            Expr::Lit(lit) => match lit {
-              Lit::Str(str_) => str_.value.clone(),
-              _ => unreachable!("Unexpected non-static CJS export"),
-            },
+            Expr::Lit(Lit::Str(str_)) => str_.value.clone(),
             _ => unreachable!("Unexpected non-static CJS export"),
           }
         } else {
@@ -1351,10 +1345,7 @@ impl Visit for Collect {
 
     let is_static = match &*node.prop {
       Expr::Ident(_) => !node.computed,
-      Expr::Lit(lit) => match lit {
-        Lit::Str(_) => true,
-        _ => false,
-      },
+      Expr::Lit(Lit::Str(_)) => true,
       _ => false,
     };
 
@@ -1520,13 +1511,7 @@ impl Visit for Collect {
                     })
                   }
                 }
-                Expr::Lit(lit) => match lit {
-                  Lit::Str(str_) => PropName::Str(str_.clone()),
-                  _ => PropName::Computed(ComputedPropName {
-                    span: DUMMY_SP,
-                    expr: Box::new(*expr.clone()),
-                  }),
-                },
+                Expr::Lit(Lit::Str(str_)) => PropName::Str(str_.clone()),
                 _ => PropName::Computed(ComputedPropName {
                   span: DUMMY_SP,
                   expr: Box::new(*expr.clone()),
@@ -1585,10 +1570,7 @@ impl Visit for Collect {
               let then: JsWord = "then".into();
               let is_then = match &*member.prop {
                 Expr::Ident(ident) => !member.computed && ident.sym == then,
-                Expr::Lit(lit) => match lit {
-                  Lit::Str(str) => str.value == then,
-                  _ => false,
-                },
+                Expr::Lit(Lit::Str(str)) => str.value == then,
                 _ => false,
               };
 
@@ -1786,10 +1768,8 @@ fn match_require(node: &Expr, decls: &HashSet<IdentId>, ignore_mark: Mark) -> Op
             && !is_marked(ident.span, ignore_mark)
           {
             if let Some(arg) = call.args.get(0) {
-              if let Expr::Lit(lit) = &*arg.expr {
-                if let Lit::Str(str_) = lit {
-                  return Some(str_.value.clone());
-                }
+              if let Expr::Lit(Lit::Str(str_)) = &*arg.expr {
+                return Some(str_.value.clone());
               }
             }
           }
@@ -1811,10 +1791,8 @@ fn match_import(node: &Expr, ignore_mark: Mark) -> Option<JsWord> {
         Expr::Ident(ident) => {
           if ident.sym == js_word!("import") && !is_marked(ident.span, ignore_mark) {
             if let Some(arg) = call.args.get(0) {
-              if let Expr::Lit(lit) = &*arg.expr {
-                if let Lit::Str(str_) = lit {
-                  return Some(str_.value.clone());
-                }
+              if let Expr::Lit(Lit::Str(str_)) = &*arg.expr {
+                return Some(str_.value.clone());
               }
             }
           }
