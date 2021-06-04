@@ -392,12 +392,14 @@ fn parse(
   }
 }
 
+type EmitResult = (Vec<u8>, Vec<(swc_common::BytePos, swc_common::LineCol)>);
+
 fn emit(
   source_map: Lrc<SourceMap>,
   comments: SingleThreadedComments,
   program: &Module,
   source_maps: bool,
-) -> Result<(Vec<u8>, Vec<(swc_common::BytePos, swc_common::LineCol)>), std::io::Error> {
+) -> Result<EmitResult, std::io::Error> {
   let mut src_map_buf = vec![];
   let mut buf = vec![];
   {

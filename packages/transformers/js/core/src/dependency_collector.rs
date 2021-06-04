@@ -18,7 +18,7 @@ pub enum DependencyKind {
   WebWorker,
   ServiceWorker,
   ImportScripts,
-  URL,
+  Url,
   File,
 }
 
@@ -465,7 +465,7 @@ impl<'a> Fold for DependencyCollector<'a> {
 
   fn fold_expr(&mut self, node: ast::Expr) -> ast::Expr {
     if let Some((specifier, span)) = match_import_meta_url(&node, self.decls) {
-      self.add_dependency(specifier.clone(), span, DependencyKind::URL, None, false);
+      self.add_dependency(specifier.clone(), span, DependencyKind::Url, None, false);
 
       return ast::Expr::Call(create_require(specifier));
     }
