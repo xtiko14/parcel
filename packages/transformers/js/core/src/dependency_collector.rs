@@ -104,7 +104,7 @@ impl<'a> Fold for DependencyCollector<'a> {
       false,
     );
 
-    return node;
+    node
   }
 
   fn fold_named_export(&mut self, node: ast::NamedExport) -> ast::NamedExport {
@@ -122,7 +122,7 @@ impl<'a> Fold for DependencyCollector<'a> {
       );
     }
 
-    return node;
+    node
   }
 
   fn fold_export_all(&mut self, node: ast::ExportAll) -> ast::ExportAll {
@@ -134,7 +134,7 @@ impl<'a> Fold for DependencyCollector<'a> {
       false,
     );
 
-    return node;
+    node
   }
 
   fn fold_try_stmt(&mut self, node: ast::TryStmt) -> ast::TryStmt {
@@ -320,7 +320,7 @@ impl<'a> Fold for DependencyCollector<'a> {
             }
           }
 
-          return arg.clone();
+          arg.clone()
         })
         .collect();
 
@@ -464,7 +464,7 @@ impl<'a> Fold for DependencyCollector<'a> {
       }
     }
 
-    return node.fold_children_with(self);
+    node.fold_children_with(self)
   }
 
   fn fold_member_expr(&mut self, mut node: ast::MemberExpr) -> ast::MemberExpr {
@@ -586,7 +586,7 @@ fn build_promise_chain(node: ast::CallExpr, require_node: ast::CallExpr) -> ast:
     }
   }
 
-  return node;
+  node
 }
 
 struct PromiseTransformer {
@@ -606,7 +606,7 @@ impl Fold for PromiseTransformer {
       }
     }
 
-    return swc_ecmascript::visit::fold_return_stmt(self, node);
+    swc_ecmascript::visit::fold_return_stmt(self, node)
   }
 
   fn fold_arrow_expr(&mut self, node: ast::ArrowExpr) -> ast::ArrowExpr {
@@ -620,7 +620,7 @@ impl Fold for PromiseTransformer {
       }
     }
 
-    return swc_ecmascript::visit::fold_arrow_expr(self, node);
+    swc_ecmascript::visit::fold_arrow_expr(self, node)
   }
 
   fn fold_expr(&mut self, node: ast::Expr) -> ast::Expr {
@@ -636,7 +636,7 @@ impl Fold for PromiseTransformer {
       }
     }
 
-    return node;
+    node
   }
 }
 

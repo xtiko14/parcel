@@ -420,5 +420,5 @@ fn emit(
     emitter.emit_module(&program)?;
   }
 
-  return Ok((buf, src_map_buf));
+  Ok((buf, src_map_buf))
 }
