@@ -1,19 +1,13 @@
 // @flow strict-local
 
-import type {
-  AST,
-  Blob,
-  ConfigResult,
-  FilePath,
-  PackageJSON,
-} from '@parcel/types';
+import type {AST, Blob} from '@parcel/types';
 import type {Asset, Dependency, ParcelOptions} from './types';
 
 import v8 from 'v8';
 import {Readable} from 'stream';
 import SourceMap from '@parcel/source-map';
 import {bufferStream, blobToStream, streamFromPromise} from '@parcel/utils';
-import {getConfig, generateFromAST} from './assetUtils';
+import {generateFromAST} from './assetUtils';
 
 export default class CommittedAsset {
   value: Asset;
