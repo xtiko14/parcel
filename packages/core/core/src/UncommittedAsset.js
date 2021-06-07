@@ -369,7 +369,6 @@ export default class UncommittedAsset {
         hash: this.value.hash,
         filePath: this.value.filePath,
         type: result.type,
-        query: result.query,
         bundleBehavior:
           result.bundleBehavior ??
           (this.value.bundleBehavior == null
@@ -377,7 +376,7 @@ export default class UncommittedAsset {
             : BundleBehaviorNames[this.value.bundleBehavior]),
         isBundleSplittable:
           result.isBundleSplittable ?? this.value.isBundleSplittable,
-        isSource: result.isSource ?? this.value.isSource,
+        isSource: this.value.isSource,
         env: mergeEnvironments(this.value.env, result.env),
         dependencies:
           this.value.type === result.type
