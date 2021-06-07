@@ -325,7 +325,7 @@ export default class UncommittedAsset {
     return dep.id;
   }
 
-  addIncludedFile(filePath: FilePath) {
+  invalidateOnFileChange(filePath: FilePath) {
     let invalidation: RequestInvalidation = {
       type: 'file',
       filePath,

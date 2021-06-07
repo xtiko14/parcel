@@ -388,7 +388,7 @@ export type Config = {|
   env: Environment,
   resultHash: ?string,
   result: ConfigResult,
-  includedFiles: Set<FilePath>,
+  invalidateOnFileChange: Set<FilePath>,
   invalidateOnFileCreate: Array<FileCreateInvalidation>,
   invalidateOnOptionChange: Set<string>,
   devDeps: Array<DevDepOptions>,
